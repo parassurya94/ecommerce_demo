@@ -108,7 +108,7 @@ export default function Product() {
       <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 400px' }}>
           {product.media_gallery?.[0]?.url ? (
-            <img src={product.media_gallery[0].url} alt={product.name} style={{ width: '100%', objectFit: 'contain' }} />
+            <img src={`https://wsrv.nl/?url=${encodeURIComponent(product.media_gallery[0].url)}`} alt={product.name} style={{ width: '100%', objectFit: 'contain' }} />
           ) : (
             <div style={{ width: '100%', height: '400px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>No Image available</div>
           )}

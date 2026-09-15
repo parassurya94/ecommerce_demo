@@ -412,7 +412,7 @@ export default function Cart() {
                   <tr key={item.uid} style={{ borderBottom: '1px solid var(--border-color)' }}>
                     <td style={{ padding: '1.5rem 0', display: 'flex', gap: '1rem', alignItems: 'center' }}>
                       {item.product.image?.url ? (
-                        <img src={item.product.image.url} alt={item.product.name} style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
+                        <img src={`https://wsrv.nl/?url=${encodeURIComponent(item.product.image.url)}`} alt={item.product.name} style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
                       ) : (
                         <div style={{ width: '60px', height: '60px', background: '#f5f5f5' }}></div>
                       )}

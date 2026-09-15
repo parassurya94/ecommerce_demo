@@ -200,7 +200,7 @@ export default function Category() {
                   <div style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <Link to={`/p/${product.url_key}.html`} className="product-image-container">
                       {product.image?.url ? (
-                        <img src={product.image.url} alt={product.name} className="product-image" />
+                        <img src={`https://wsrv.nl/?url=${encodeURIComponent(product.image.url)}`} alt={product.name} className="product-image" />
                       ) : (<span>No Image</span>)}
                     </Link>
                     <div className="product-info">
