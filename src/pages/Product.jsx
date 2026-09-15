@@ -118,7 +118,7 @@ export default function Product() {
           <h1 style={{ margin: '0 0 10px 0' }}>{product.name}</h1>
           <p style={{ color: '#666', margin: '0 0 20px 0' }}>SKU: {product.sku}</p>
           <h2 style={{ margin: '0 0 20px 0' }}>
-            {product.price_range.minimum_price.regular_price.currency} {product.price_range.minimum_price.regular_price.value}
+            {formatCurrency(product.price_range.minimum_price.regular_price.value, product.price_range.minimum_price.regular_price.currency)}
           </h2>
           
           <div dangerouslySetInnerHTML={{ __html: product.description?.html }} style={{ margin: '20px 0', lineHeight: '1.6' }} />

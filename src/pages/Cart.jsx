@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useMutation, useQuery, gql } from 'urql';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const GET_COUNTRIES = gql`
   query GetCountries {
@@ -425,7 +426,7 @@ export default function Cart() {
                     </td>
 
                     <td>
-                      ${item.prices.price.value.toFixed(2)}
+                      {formatCurrency(item.prices.price.value, item.prices.price.currency)}
                     </td>
 
                     <td>
@@ -442,7 +443,7 @@ export default function Cart() {
                     </td>
 
                     <td style={{ textAlign: 'right', fontWeight: '600' }}>
-                      ${item.prices.row_total.value.toFixed(2)}
+                      {formatCurrency(item.prices.row_total.value, item.prices.row_total.currency)}
                     </td>
 
                     <td style={{ textAlign: 'right' }}>
@@ -640,7 +641,7 @@ export default function Cart() {
                           checked={selectedShipping?.method_code === method.method_code}
                           onChange={() => handleSelectShippingMethod(method.carrier_code, method.method_code)}
                         />
-                        <span>{method.carrier_title} - {method.method_title} (${method.amount.value.toFixed(2)})</span>
+                        <span>{method.carrier_title} - {method.method_title} ({formatCurrency(method.amount.value, method.amount.currency)})</span>
                       </div>
                     ))}
                   </div>
@@ -651,31 +652,31 @@ export default function Cart() {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: 'var(--secondary-color)' }}>
             <span>Subtotal</span>
-            <span>${prices?.subtotal_excluding_tax?.value.toFixed(2)}</span>
+            <span>{formatCurrency(prices?.subtotal_excluding_tax?.value, prices?.subtotal_excluding_tax?.currency)}</span>
           </div>
 
           {selectedShipping ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: 'var(--secondary-color)' }}>
               <span>Shipping ({selectedShipping.carrier_title} - {selectedShipping.method_title})</span>
-              <span>${selectedShipping.amount.value.toFixed(2)}</span>
+              <span>{formatCurrency(selectedShipping.amount.value, selectedShipping.amount.currency)}</span>
             </div>
           ) : (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: 'var(--secondary-color)' }}>
               <span>Shipping (Flat Rate - Fixed)</span>
-              <span>$10.00</span>
+              <span>{formatCurrency(10, 'USD')}</span>
             </div>
           )}
 
           {prices?.discounts?.map((discount, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: '#166534' }}>
               <span>Discount ({discount.label || 'Applied'})</span>
-              <span>-${discount.amount?.value?.toFixed(2)}</span>
+              <span>-{formatCurrency(discount.amount?.value, discount.amount?.currency)}</span>
             </div>
           ))}
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1.25rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
             <span>Order Total</span>
-            <span>${prices?.grand_total?.value.toFixed(2)}</span>
+            <span>{formatCurrency(prices?.grand_total?.value, prices?.grand_total?.currency)}</span>
           </div>
 
           <button onClick={() => alert('Proceed to Checkout action triggered.')} className="btn-primary" style={{ width: '100%', marginBottom: '1rem' }}>

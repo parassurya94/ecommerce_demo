@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useQuery, gql } from 'urql';
 import { useCart } from '../context/CartContext';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const GET_CATEGORY = gql`
   query GetCategory($urlPath: String!) {
@@ -208,7 +209,7 @@ export default function Category() {
                         <h4 className="product-name">{product.name}</h4>
                       </Link>
                       <div className="product-price">
-                        {product.price_range.minimum_price.regular_price.currency} {product.price_range.minimum_price.regular_price.value}
+                        {formatCurrency(product.price_range.minimum_price.regular_price.value, product.price_range.minimum_price.regular_price.currency)}
                       </div>
                       <div style={{ marginTop: 'auto' }}>
                         <button 

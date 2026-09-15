@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, gql } from 'urql';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const GET_ORDER_DETAILS = gql`
   query GetOrderDetails($orderNumber: String!) {
@@ -205,10 +206,10 @@ export default function OrderView() {
                   <tr key={item.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                     <td style={{ padding: '1rem 0', fontWeight: '500' }}>{item.product_name}</td>
                     <td style={{ color: 'var(--secondary-color)' }}>{item.product_sku}</td>
-                    <td>{item.product_sale_price.currency} {item.product_sale_price.value.toFixed(2)}</td>
+                    <td>{formatCurrency(item.product_sale_price.value, item.product_sale_price.currency)}</td>
                     <td>{item.quantity_ordered}</td>
                     <td style={{ textAlign: 'right', fontWeight: '600' }}>
-                      {item.product_sale_price.currency} {(item.product_sale_price.value * item.quantity_ordered).toFixed(2)}
+                      {formatCurrency(item.product_sale_price.value * item.quantity_ordered, item.product_sale_price.currency)}
                     </td>
                   </tr>
                 ))}
@@ -263,21 +264,21 @@ export default function OrderView() {
               <tbody>
                 <tr>
                   <td style={{ padding: '0.5rem 0', color: 'var(--secondary-color)' }}>Subtotal</td>
-                  <td style={{ padding: '0.5rem 0' }}>{order.total.subtotal.currency} {order.total.subtotal.value.toFixed(2)}</td>
+                  <td style={{ padding: '0.5rem 0' }}>{formatCurrency(order.total.subtotal.value, order.total.subtotal.currency)}</td>
                 </tr>
                 <tr>
                   <td style={{ padding: '0.5rem 0', color: 'var(--secondary-color)' }}>Shipping & Handling</td>
-                  <td style={{ padding: '0.5rem 0' }}>{order.total.shipping_handling?.total_amount.currency} {order.total.shipping_handling?.total_amount.value.toFixed(2)}</td>
+                  <td style={{ padding: '0.5rem 0' }}>{formatCurrency(order.total.shipping_handling?.total_amount.value, order.total.shipping_handling?.total_amount.currency)}</td>
                 </tr>
                 {order.total.taxes?.map((tax, i) => (
                   <tr key={i}>
                     <td style={{ padding: '0.5rem 0', color: 'var(--secondary-color)' }}>Tax</td>
-                    <td style={{ padding: '0.5rem 0' }}>{tax.amount.currency} {tax.amount.value.toFixed(2)}</td>
+                    <td style={{ padding: '0.5rem 0' }}>{formatCurrency(tax.amount.value, tax.amount.currency)}</td>
                   </tr>
                 ))}
                 <tr style={{ borderTop: '2px solid var(--border-color)', fontWeight: '700', fontSize: '1.2rem' }}>
                   <td style={{ padding: '1rem 0 0 0' }}>Grand Total</td>
-                  <td style={{ padding: '1rem 0 0 0' }}>{order.total.grand_total.currency} {order.total.grand_total.value.toFixed(2)}</td>
+                  <td style={{ padding: '1rem 0 0 0' }}>{formatCurrency(order.total.grand_total.value, order.total.grand_total.currency)}</td>
                 </tr>
               </tbody>
             </table>

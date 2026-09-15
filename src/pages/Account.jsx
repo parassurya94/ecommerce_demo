@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, gql } from 'urql';
 import { useAuth } from '../context/AuthContext';
+import { formatCurrency } from '../utils/formatCurrency';
 
 // --- GraphQL Queries & Mutations ---
 const GET_CUSTOMER_DATA = gql`
@@ -316,7 +317,7 @@ export default function Account() {
               <tr key={order.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                 <td style={{ padding: '1rem 0' }}>{order.number}</td>
                 <td>{order.order_date.split(' ')[0]}</td>
-                <td>{order.total.grand_total.currency} {order.total.grand_total.value.toFixed(2)}</td>
+                <td>{formatCurrency(order.total.grand_total.value, order.total.grand_total.currency)}</td>
                 <td>{order.status}</td>
                 <td>
                   <button 
