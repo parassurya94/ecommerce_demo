@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, gql } from 'urql';
 import { useCart } from '../context/CartContext';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const GET_PDP = gql`
   query GetProductDetails($urlKey: String!) {
