@@ -194,25 +194,30 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = async (sku, quantity = 1) => {
-    if (isAuthenticated) {
-      const cId = cartData?.id || cartId || localStorage.getItem('magento_cart_id'); 
-      if (!cId) return;
+    // 1. Resolve the correct cart ID based on authentication status
+    let cId = isAuthenticated 
+      ? (cartData?.id || cartId || localStorage.getItem('magento_cart_id')) 
+      : await getOrCreateCartId();
+      
+    if (!cId) return { error: true, message: "Could not establish cart session." };
 
-      const result = await addToCartMutation({ cartId: cId, sku, quantity });
-      if (!result.error) {
-        refetchCart({ requestPolicy: 'network-only' });
-      }
-      return result;
-    } else {
-      const cId = await getOrCreateCartId();
-      if (!cId) return;
-
-      const result = await addToCartMutation({ cartId: cId, sku, quantity });
-      if (!result.error) {
-        refetchCart({ requestPolicy: 'network-only' });
-      }
-      return result;
+    // 2. Execute the unified mutation
+    const result = await addToCartMutation({ cartId: cId, sku, quantity });
+    
+    // 3. Intercept silent Magento GraphQL user errors (e.g., missing options for Configurable/Grouped products)
+    const userErrors = result.data?.addProductsToCart?.user_errors;
+    if (userErrors && userErrors.length > 0) {
+      return { 
+        error: true, 
+        message: userErrors[0].message 
+      };
     }
+
+    // 4. Refetch cart on success
+    if (!result.error) {
+      refetchCart({ requestPolicy: 'network-only' });
+    }
+    return result;
   };
 
   const updateQuantity = async (uid, quantity) => {
