@@ -84,17 +84,19 @@ const GET_CUSTOMER_CART = gql`
   }
 `;
 
-// Unified Magento 2 Add To Cart
+// Unified Magento 2 Add To Cart (Supports ALL Product Types)
 const ADD_TO_CART = gql`
-  mutation AddToCart($cartId: String!, $sku: String!, $quantity: Float!) {
+  mutation AddToCart($cartId: String!, $cartItems: [CartItemInput!]!) {
     addProductsToCart(
       cartId: $cartId,
-      cartItems: [{ sku: $sku, quantity: $quantity }]
+      cartItems: $cartItems
     ) {
       cart {
         total_quantity
       }
-      user_errors { message }
+      user_errors { 
+        message 
+      }
     }
   }
 `;
@@ -193,18 +195,31 @@ export const CartProvider = ({ children }) => {
     return null;
   };
 
-  const addToCart = async (sku, quantity = 1) => {
-    // 1. Resolve the correct cart ID based on authentication status
+  const addToCart = async (skuOrItems, quantity = 1, selectedOptions = []) => {
     let cId = isAuthenticated 
       ? (cartData?.id || cartId || localStorage.getItem('magento_cart_id')) 
       : await getOrCreateCartId();
       
     if (!cId) return { error: true, message: "Could not establish cart session." };
 
-    // 2. Execute the unified mutation
-    const result = await addToCartMutation({ cartId: cId, sku, quantity });
+    // Format the payload to support Simple, Configurable, and Grouped products
+    let cartItems = [];
     
-    // 3. Intercept silent Magento GraphQL user errors (e.g., missing options for Configurable/Grouped products)
+    if (Array.isArray(skuOrItems)) {
+      // Handles Grouped Products passed as an array
+      cartItems = skuOrItems;
+    } else {
+      // Handles Simple & Configurable products
+      const item = { sku: skuOrItems, quantity };
+      if (selectedOptions && selectedOptions.length > 0) {
+        item.selected_options = selectedOptions;
+      }
+      cartItems = [item];
+    }
+
+    const result = await addToCartMutation({ cartId: cId, cartItems });
+    
+    // Intercept silent Magento GraphQL user errors
     const userErrors = result.data?.addProductsToCart?.user_errors;
     if (userErrors && userErrors.length > 0) {
       return { 
@@ -213,7 +228,6 @@ export const CartProvider = ({ children }) => {
       };
     }
 
-    // 4. Refetch cart on success
     if (!result.error) {
       refetchCart({ requestPolicy: 'network-only' });
     }
